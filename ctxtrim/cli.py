@@ -9,7 +9,7 @@ import sys
 from html.parser import HTMLParser
 from pathlib import Path
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 
 def estimate_tokens(text: str) -> int:
@@ -182,7 +182,13 @@ def fit_budget(text: str, budget: int) -> str:
             lo = mid + 1
         else:
             hi = mid - 1
-    return best or raw[: max(0, budget * 2)]
+    if best:
+        return best
+    # Budget is too small for any prefix plus a trim marker.
+    marker = "…"
+    if estimate_tokens(marker) <= budget:
+        return marker
+    return ""
 
 
 def process(text: str, fmt: str, strategy: str, budget: int) -> dict:
